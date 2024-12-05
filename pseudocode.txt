@@ -12,8 +12,11 @@ recieve msg{
     }
     sum = sum + input
     amount = amount + 1
+
+    write incoming msg in logging.log
 }
-write in file{
+
+write in values.txt{
     "max:" max
     "min:" min
     "gem:" sum/amount

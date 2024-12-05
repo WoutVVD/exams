@@ -4,4 +4,5 @@
 #define QOS         1                                           // Quality of Service level
 #define TIMEOUT     10000L                                      // Timeout in milliseconds
 
-#define filepath    "./logging.log"                             //path to log file
+#define logFilepath    "./logging.log"                           //path to log file
+#define valuesFilepath "./values.txt"                            //path to log file
