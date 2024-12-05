@@ -5,4 +5,4 @@
 #define TIMEOUT     10000L                                      // Timeout in milliseconds
 
 #define logFilepath    "./logging.log"                           //path to log file
-#define valuesFilepath "./values.txt"                            //path to log file
+#define valuesFilepath "./values.txt"                            //path to values file
