@@ -1,0 +1,20 @@
+recieve data over mqtt broker{}
+get data from mqtt msg{}
+
+max = min = sum = amount = 0
+
+recieve msg{
+    if input > max{
+        input = max
+    }
+    if input < min {
+        input = min
+    }
+    sum = sum + input
+    amount = amount + 1
+}
+write in file{
+    "max:" max
+    "min:" min
+    "gem:" sum/amount
+}
