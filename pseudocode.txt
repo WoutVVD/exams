@@ -1,9 +1,9 @@
 recieve data over mqtt broker{}
 get data from mqtt msg{}
 
-max = min = sum = amount = 0
-
 recieve msg{
+    write incoming msg in logging.log
+
     if input > max{
         input = max
     }
@@ -13,11 +13,11 @@ recieve msg{
     sum = sum + input
     amount = amount + 1
 
-    write incoming msg in logging.log
 }
 
 write in values.txt{
-    "max:" max
-    "min:" min
-    "gem:" sum/amount
+    "date - time: " datetime
+    "max: " max
+    "min: " min
+    "gem: " sum/amount
 }
