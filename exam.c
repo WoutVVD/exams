@@ -48,6 +48,23 @@ void insert_first(char *datetime, int rate_indicator, float current_power, float
     lk->next = NULL;
 
     head = lk;
+
+    //print header
+    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+           "Elektriciteit- en gas verbruik - totalen per dag\n"
+           "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"   //extra empty line
+           "STARTWAARDEN\n\n"                                                                              //extra empty line
+           "DATUM - TIJD:  %s\n"
+           "DAG \t Totaal verbruik \t = %f kWh\n"
+           "DAG \t Totaal opbrengst \t = %f kWh\n"
+           "NACHT \t Totaal verbruik \t = %f kWh\n"
+           "NACHT \t Totaal opbrengst \t = %f kWh\n"
+           "GAS \t Totaal verbruik \t = %f m3\n"
+           "------------------------------------------------------------------------------------------\n"
+           "TOTALEN:\n"
+           "------------------------------------------------------------------------------------------\n\n" //extra empty line
+           ,head->datum_tijd_stroom,head->totaal_dagverbruik,head->totaal_dagopbrengst,head->totaal_nachtverbruik,head->totaal_nachtopbrengst,(head->totaal_gasverbruik*11.55)
+        );
 }
 
 //insert next
@@ -174,23 +191,6 @@ void cmdPrint_all(){
 
     //last record of the day
     struct tbl *temp2 = search_list(&current);
-
-    //print header
-    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-           "Elektriciteit- en gas verbruik - totalen per dag\n"
-           "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"   //extra empty line
-           "STARTWAARDEN\n\n"                                                                              //extra empty line
-           "DATUM - TIJD:  %s\n"
-           "DAG \t Totaal verbruik \t = %f kWh\n"
-           "DAG \t Totaal opbrengst \t = %f kWh\n"
-           "NACHT \t Totaal verbruik \t = %f kWh\n"
-           "NACHT \t Totaal opbrengst \t = %f kWh\n"
-           "GAS \t Totaal verbruik \t = %f m3\n"
-           "------------------------------------------------------------------------------------------\n"
-           "TOTALEN:\n"
-           "------------------------------------------------------------------------------------------\n\n" //extra empty line
-           ,temp1->datum_tijd_stroom,temp1->totaal_dagverbruik,temp1->totaal_dagopbrengst,temp1->totaal_nachtverbruik,temp1->totaal_nachtopbrengst,(temp1->totaal_gasverbruik*11.55)
-        );
 
     //calculate totals
     float total_consum = temp2->totaal_dagverbruik + temp2->totaal_nachtverbruik;
