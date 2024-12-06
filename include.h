@@ -8,4 +8,3 @@
 #define MAX_MSG_LEN    1024                                     //max length of message
 
 #define logFilepath    "./logging.log"                           //path to log file
-#define valuesFilepath "./values.txt"                            //path to values file
