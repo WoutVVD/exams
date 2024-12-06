@@ -63,7 +63,7 @@ void insert_first(char *datetime, int rate_indicator, float current_power, float
            "------------------------------------------------------------------------------------------\n"
            "TOTALEN:\n"
            "------------------------------------------------------------------------------------------\n\n" //extra empty line
-           ,head->datum_tijd_stroom,head->totaal_dagverbruik,head->totaal_dagopbrengst,head->totaal_nachtverbruik,head->totaal_nachtopbrengst,(head->totaal_gasverbruik*11.55)
+           ,lk->datum_tijd_stroom,lk->totaal_dagverbruik,lk->totaal_dagopbrengst,lk->totaal_nachtverbruik,lk->totaal_nachtopbrengst,(lk->totaal_gasverbruik*11.55)
         );
 }
 
@@ -87,6 +87,22 @@ void insert_next(struct tbl *list, char *datetime, int rate_indicator, float cur
     lk->next = NULL;
 
     list->next = lk;
+
+    //calculate totals
+    float total_consum = lk->totaal_dagverbruik + lk->totaal_nachtverbruik;
+    float total_output = head->totaal_dagopbrengst + head->totaal_nachtopbrengst - lk->totaal_dagopbrengst - lk->totaal_nachtopbrengst;
+
+    //print data
+    printf("Datum: %s\n"
+           "---------------\n"
+           "STROOM:\n"
+           "\t\t Totaal verbruik \t = %f kWh\n"
+           "\t\t Totaal opbrengs \t = %f kWh\n"
+           "GAS:\n"
+           "\t\t Totaal verbruik \t = %f kWh\n"
+           "*\n"
+           ,total_consum,total_output,(lk->totaal_gasverbruik*11.55)
+    );
 }
 
 //search in tbl
@@ -163,7 +179,11 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     return 1;
     }
     else{
-        cmdPrint_all();
+        //print footer
+         printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+                "Einde van dit rapport\n"
+                "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+                );
         return 0;
     }
 }
@@ -180,39 +200,6 @@ void logfile_write(char error_in[MAX_MSG_LEN]){
     logfile = fopen(logFilepath, "a");
     fprintf(logfile, "%s\n", error_in);
     fclose(logfile);
-}
-
-//print on cmd/terminal
-void cmdPrint_all(){
-    current = head;
-
-    //first record of the day
-    struct tbl *temp1 = search_list(&current);
-
-    //last record of the day
-    struct tbl *temp2 = search_list(&current);
-
-    //calculate totals
-    float total_consum = temp2->totaal_dagverbruik + temp2->totaal_nachtverbruik;
-    float total_output = temp1->totaal_dagopbrengst + temp1->totaal_nachtopbrengst - temp2->totaal_dagopbrengst - temp2->totaal_nachtopbrengst;
-
-    //print data
-    printf("Datum: %s\n"
-           "---------------\n"
-           "STROOM:\n"
-           "\t\t Totaal verbruik \t = %f kWh\n"
-           "\t\t Totaal opbrengs \t = %f kWh\n"
-           "GAS:\n"
-           "\t\t Totaal verbruik \t = %f kWh\n"
-           "*\n"
-           ,total_consum,total_output,(temp2->totaal_gasverbruik*11.55)
-    );
-
-    //print footer
-    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-           "Einde van dit rapport\n"
-           "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-    );
 }
 
 //main
