@@ -5,6 +5,7 @@
 #define TIMEOUT     10000L                                      // Timeout in milliseconds
 
 #define DATE_TIME_LEN  17                                       //length of date time string
+#define MAX_MSG_LEN    1024                                     //max length of message
 
 #define logFilepath    "./logging.log"                           //path to log file
 #define valuesFilepath "./values.txt"                            //path to values file

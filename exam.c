@@ -43,10 +43,10 @@ void insert_first(struct tbl **head, char *datetime, int *rate_indicator, float 
     lk->next = NULL;
 
     *head = lk;
-
 }
 
-void insert_first(struct tbl *list, char *datetime, int *rate_indicator, float *current_power, float *current_voltage, float *total_day_consum, float *total_night_consum, float *total_day_output, float *total_night_output, float *total_gas_consum)
+//insert next
+void insert_next(struct tbl *list, char *datetime, int *rate_indicator, float *current_power, float *current_voltage, float *total_day_consum, float *total_night_consum, float *total_day_output, float *total_night_output, float *total_gas_consum)
 {
     struct tbl *lk = (struct tbl *)malloc(sizeof(struct tbl));
 
@@ -78,6 +78,7 @@ void delivered(void *context, MQTTClient_deliveryToken dt) {
 // This function is called upon when an incoming message from mqtt is arrived
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
     char *error_in = message->payload;
+    logfile_write(error_in);
 
     printf( "Msg in : <%s>\n", error_in );
 
@@ -98,8 +99,16 @@ void connlost(void *context, char *cause) {
     printf("     cause: %s\n", cause);
 }
 
+void logfile_write(char error_in[MAX_MSG_LEN]){
+    FILE *logfile;
+    logfile = fopen("logfile.txt", "a");
+    fprintf(logfile, "%s\n", error_in);
+    fclose(logfile);
+}
+
 //print
-void print_all(struct tbl **list){
+void cmdPrint_all(struct tbl **list){
+    
     struct tbl *temp = head;
 
     //print header
@@ -119,9 +128,11 @@ void print_all(struct tbl **list){
            ,temp->datum_tijd_stroom,temp->totaal_dagverbruik,temp->totaal_dagopbrengst,temp->totaal_nachtverbruik,temp->totaal_nachtopbrengst,temp->totaal_gasverbruik
     );
 
+
+
+    //calculate totals
     float total_consum = temp->totaal_dagverbruik + temp->totaal_nachtverbruik;
     float total_output = temp->totaal_dagopbrengst + temp->totaal_nachtopbrengst;
-
 
     //print data
     printf("Datum: %s\n"
