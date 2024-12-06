@@ -27,7 +27,7 @@ struct tbl *head = NULL;
 struct tbl *current = NULL;
 
 //insert first
-void insert_first(struct tbl **head, char *datetime, int rate_indicator, float current_power, float current_voltage, float total_day_consum, float total_night_consum, float total_day_output, float total_night_output, float total_gas_consum)
+void insert_first(char *datetime, int rate_indicator, float current_power, float current_voltage, float total_day_consum, float total_night_consum, float total_day_output, float total_night_output, float total_gas_consum)
 {
     struct tbl *lk = (struct tbl *)malloc(sizeof(struct tbl));
 
@@ -45,7 +45,7 @@ void insert_first(struct tbl **head, char *datetime, int rate_indicator, float c
 
     lk->next = NULL;
 
-    *head = lk;
+    head = lk;
 }
 
 //insert next
@@ -70,6 +70,31 @@ void insert_next(struct tbl *list, char *datetime, int rate_indicator, float cur
     list->next = lk;
 }
 
+//format msg + add to tbl
+void formatmsg(char *msg, int entry){
+    char datetime_power[DATE_TIME_LEN];
+    int rate_indicator;
+    float current_power;
+    float current_voltage;
+    float total_day_consum;
+    float total_night_consum;
+    float total_day_output;
+    float total_night_output;
+    char datetime_gas[DATE_TIME_LEN];
+    float total_gas_consum;
+
+    //first insert or not?
+    sscanf(msg, "%s;%d;%f;%f;%f;%f;%f;%f;%f", datetime_power, &rate_indicator, &current_power, &current_voltage, &total_day_consum, &total_night_consum, &total_day_output, &total_night_output, datetime_gas ,&total_gas_consum);
+    if (entry == 0){
+        insert_first(datetime_power, rate_indicator, current_power, current_voltage, total_day_consum, total_night_consum, total_day_output, total_night_output, total_gas_consum);
+        current = head;
+    }
+    else{
+        insert_next(current, datetime_power, rate_indicator, current_power, current_voltage, total_day_consum, total_night_consum, total_day_output, total_night_output, total_gas_consum);
+        current = current->next;
+    }
+}
+
 // This function is called upon when a message is delivered
 void delivered(void *context, MQTTClient_deliveryToken dt) {
     #ifdef DEBUG
@@ -83,23 +108,23 @@ void delivered(void *context, MQTTClient_deliveryToken dt) {
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
     char *msg = message->payload;
 
-    // Create a new client to publish the message
-    MQTTClient client = (MQTTClient)context;
-    MQTTClient_message pubmsg = MQTTClient_message_initializer;
-    MQTTClient_deliveryToken token;
-
-    MQTTClient_freeMessage(&message);
-    MQTTClient_free(topicName);
-
-    //end of file report?
+    //end of report?
     char endcheck[DATE_TIME_LEN];
     char rest[MAX_MSG_LEN];
+    int count = 0;
     sscanf(msg, "%s;%s", endcheck, rest);
-    if(endcheck == "00.00.00-00:00:00"){
-        return 0;
+    if(endcheck != "00.00.00-00:00:00"){
+        if (count == 0){
+            formatmsg(msg, 0); //format msg and add to tbl, 0 is for first time
+            count++;
+        }
+        else{
+            formatmsg(msg, 1); //format msg and add to tbl, 1 is for other times
+        }
+        return 1;
     }
     else{
-        return 1;
+        return 0;
     }
 }
 
