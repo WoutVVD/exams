@@ -25,20 +25,21 @@ struct tbl *head = NULL;
 struct tbl *current = NULL;
 
 //insert first
-void insert_first(struct tbl **head, char *datetime, int *rate_indicator, float *current_power, float *current_voltage, float *total_day_consum, float *total_night_consum, float *total_day_output, float *total_night_output, float *total_gas_consum)
+void insert_first(struct tbl **head, char *datetime, int rate_indicator, float current_power, float current_voltage, float total_day_consum, float total_night_consum, float total_day_output, float total_night_output, float total_gas_consum)
 {
     struct tbl *lk = (struct tbl *)malloc(sizeof(struct tbl));
 
     strcpy(lk->datum_tijd_stroom, datetime);
-    strcpy(lk->tarief_indicator, rate_indicator);
-    strcpy(lk->actueel_stroomverbruik, current_power);
-    strcpy(lk->actueel_spanning, current_voltage);
-    strcpy(lk->totaal_dagverbruik, total_day_consum);
-    strcpy(lk->totaal_nachtverbruik, total_night_consum);
-    strcpy(lk->totaal_dagopbrengst, total_day_output);
-    strcpy(lk->totaal_nachtopbrengst, total_night_output);
     strcpy(lk->datum_tijd_gas, datetime);
-    strcpy(lk->totaal_gasverbruik, total_gas_consum);
+
+    lk->tarief_indicator = rate_indicator;
+    lk->actueel_stroomverbruik, current_power;
+    lk->actueel_spanning, current_voltage;
+    lk->totaal_dagverbruik, total_day_consum;
+    lk->totaal_nachtverbruik, total_night_consum;
+    lk->totaal_dagopbrengst, total_day_output;
+    lk->totaal_nachtopbrengst, total_night_output;
+    lk->totaal_gasverbruik, total_gas_consum;
 
     lk->next = NULL;
 
@@ -46,20 +47,21 @@ void insert_first(struct tbl **head, char *datetime, int *rate_indicator, float 
 }
 
 //insert next
-void insert_next(struct tbl *list, char *datetime, int *rate_indicator, float *current_power, float *current_voltage, float *total_day_consum, float *total_night_consum, float *total_day_output, float *total_night_output, float *total_gas_consum)
+void insert_next(struct tbl *list, char *datetime, int rate_indicator, float current_power, float current_voltage, float total_day_consum, float total_night_consum, float total_day_output, float total_night_output, float total_gas_consum)
 {
     struct tbl *lk = (struct tbl *)malloc(sizeof(struct tbl));
 
     strcpy(lk->datum_tijd_stroom, datetime);
-    strcpy(lk->tarief_indicator, rate_indicator);
-    strcpy(lk->actueel_stroomverbruik, current_power);
-    strcpy(lk->actueel_spanning, current_voltage);
-    strcpy(lk->totaal_dagverbruik, total_day_consum);
-    strcpy(lk->totaal_nachtverbruik, total_night_consum);
-    strcpy(lk->totaal_dagopbrengst, total_day_output);
-    strcpy(lk->totaal_nachtopbrengst, total_night_output);
     strcpy(lk->datum_tijd_gas, datetime);
-    strcpy(lk->totaal_gasverbruik, total_gas_consum);
+
+    lk->tarief_indicator = rate_indicator;
+    lk->actueel_stroomverbruik, current_power;
+    lk->actueel_spanning, current_voltage;
+    lk->totaal_dagverbruik, total_day_consum;
+    lk->totaal_nachtverbruik, total_night_consum;
+    lk->totaal_dagopbrengst, total_day_output;
+    lk->totaal_nachtopbrengst, total_night_output;
+    lk->totaal_gasverbruik, total_gas_consum;
 
     lk->next = NULL;
 
@@ -77,10 +79,8 @@ void delivered(void *context, MQTTClient_deliveryToken dt) {
 
 // This function is called upon when an incoming message from mqtt is arrived
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
-    char *error_in = message->payload;
-    logfile_write(error_in);
-
-    printf( "Msg in : <%s>\n", error_in );
+    char *msg = message->payload;
+    logfile_write(msg);
 
     // Create a new client to publish the message
     MQTTClient client = (MQTTClient)context;
@@ -153,7 +153,6 @@ void cmdPrint_all(struct tbl **list){
            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
     );
 }
-
 
 int main() {
    // Open MQTT client for listening
