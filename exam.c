@@ -5,6 +5,8 @@
 #include <MQTTClient.h>
 #include "include.h"            //file with #includes
 
+int count = 0;
+
 
 volatile MQTTClient_deliveryToken deliveredtoken;
 
@@ -70,6 +72,22 @@ void insert_next(struct tbl *list, char *datetime, int rate_indicator, float cur
     list->next = lk;
 }
 
+//search in tbl
+int search_list( struct tbl **list){
+    int dag1, dag2;
+    struct tbl *temp = current;
+    sscanf(temp->datum_tijd_stroom, "%d-%s", &dag1);
+    while(temp != NULL) {
+        sscanf(temp->next->datum_tijd_stroom, "%d-%s", &dag2);
+        if ( dag1 != dag2) {
+            *list = temp;
+            return *list;
+        }
+    temp=temp->next;
+    }
+    return 0;
+} 
+
 //format msg + add to tbl
 void formatmsg(char *msg, int entry){
     char datetime_power[DATE_TIME_LEN];
@@ -109,21 +127,26 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
     char *msg = message->payload;
 
     //end of report?
-    char endcheck[DATE_TIME_LEN];
+    char endCheck[DATE_TIME_LEN];
     char rest[MAX_MSG_LEN];
-    int count = 0;
-    sscanf(msg, "%s;%s", endcheck, rest);
-    if(endcheck != "00.00.00-00:00:00"){
-        if (count == 0){
-            formatmsg(msg, 0); //format msg and add to tbl, 0 is for first time
-            count++;
+    sscanf(msg, "%s;%s", endCheck, rest);
+
+    if (endCheck != "00.00.00-00:00:00"){
+        while(endCheck != "00.00.00-00:00:00"){
+            sscanf(msg, "%s;%s", endCheck, rest);
+
+            if (count == 0){
+                formatmsg(msg, 0); //format msg and add to tbl, 0 is for first time
+                count++;
+            }
+            else{
+                formatmsg(msg, 1); //format msg and add to tbl, 1 is for other times
+            }
         }
-        else{
-            formatmsg(msg, 1); //format msg and add to tbl, 1 is for other times
-        }
-        return 1;
+    return 1;
     }
     else{
+        cmdPrint_all();
         return 0;
     }
 }
@@ -143,9 +166,14 @@ void logfile_write(char error_in[MAX_MSG_LEN]){
 }
 
 //print on cmd/terminal
-void cmdPrint_all(struct tbl **list){
-    
-    struct tbl *temp = head;
+void cmdPrint_all(){
+    current = head;
+
+    //first record of the day
+    struct tbl *temp1 = search_list(&current);
+
+    //last record of the day
+    struct tbl *temp2 = search_list(&current);
 
     //print header
     printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
@@ -159,16 +187,14 @@ void cmdPrint_all(struct tbl **list){
            "NACHT \t Totaal opbrengst \t = %f kWh\n"
            "GAS \t Totaal verbruik \t = %f m3\n"
            "------------------------------------------------------------------------------------------\n"
-           "TOTALEN\n"
+           "TOTALEN:\n"
            "------------------------------------------------------------------------------------------\n\n" //extra empty line
-           ,temp->datum_tijd_stroom,temp->totaal_dagverbruik,temp->totaal_dagopbrengst,temp->totaal_nachtverbruik,temp->totaal_nachtopbrengst,temp->totaal_gasverbruik
-    );
-
-
+           ,temp1->datum_tijd_stroom,temp1->totaal_dagverbruik,temp1->totaal_dagopbrengst,temp1->totaal_nachtverbruik,temp1->totaal_nachtopbrengst,(temp1->totaal_gasverbruik*11.55)
+        );
 
     //calculate totals
-    float total_consum = temp->totaal_dagverbruik + temp->totaal_nachtverbruik;
-    float total_output = temp->totaal_dagopbrengst + temp->totaal_nachtopbrengst;
+    float total_consum = temp2->totaal_dagverbruik + temp2->totaal_nachtverbruik;
+    float total_output = temp1->totaal_dagopbrengst + temp1->totaal_nachtopbrengst - temp2->totaal_dagopbrengst - temp2->totaal_nachtopbrengst;
 
     //print data
     printf("Datum: %s\n"
@@ -179,7 +205,7 @@ void cmdPrint_all(struct tbl **list){
            "GAS:\n"
            "\t\t Totaal verbruik \t = %f kWh\n"
            "*\n"
-           ,total_consum,total_output,temp->totaal_gasverbruik
+           ,total_consum,total_output,(temp2->totaal_gasverbruik*11.55)
     );
 
     //print footer
