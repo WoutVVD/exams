@@ -1,23 +1,89 @@
-recieve data over mqtt broker{}
-get data from mqtt msg{}
+FUNTION NAMES FOR THIS DOC:
+    construct tbl
+    insert first data into tbl using incoming msg
+    insert next data into tbl using error tbl
+    read incoming msg
+    write in logfile
+    print on cmd
+----------------------------------------------------------
 
-recieve msg{
-    write incoming msg in logging.log
-
-    if input > max{
-        input = max
-    }
-    if input < min {
-        input = min
-    }
-    sum = sum + input
-    amount = amount + 1
-
+construct tbl{
+    char datum_tijd_stroom[17];     //DD.MM.YY-HH:MM:SS
+    int tarief_indicator;
+    float actueel_stroomverbruik;
+    float actueel_spanning;
+    float totaal_dagverbruik;
+    float totaal_nachtverbruik;
+    float totaal_dagopbrengst;
+    float totaal_nachtopbrengst;
+    char datum_tijd_gas[17];        //DD.MM.YY-HH:MM:SS
+    float totaal_gasverbruik;
 }
 
-write in values.txt{
-    "date - time: " datetime
-    "max: " max
-    "min: " min
-    "gem: " sum/amount
+insert first data into tbl using incoming msg{
+	allocate memory for tbl with length of tbl
+
+    tbl_datum_tijd_stroom = datetime from msg
+    tbl_tarief_indicator = rate_indicator from msg
+    tbl_actueel_stroomverbruik = current_power from msg
+    tbl_actueel_spanning = current_voltage from msg
+    tbl_totaal_dagverbruik = total_day_consum from msg
+    tbl_totaal_nachtverbruik = total_night_consum from msg
+    tbl_totaal_dagopbrengst = total_day_output from msg
+    tbl_totaal_nachtopbrengst = total_night_output from msg
+    tbl_datum_tijd_gas = datetime from msg
+    tbl_totaal_gasverbruik = total_gas_consum from msg
+
+    tbl_next = NULL
+    tbl_head = this tbl
+}
+
+insert next data into tbl using error tbl{
+    allocate memory for tbl with length of tbl
+
+    tbl_datum_tijd_stroom = datetime from msg
+    tbl_tarief_indicator = rate_indicator from msg
+    tbl_actueel_stroomverbruik = current_power from msg
+    tbl_actueel_spanning = current_voltage from msg
+    tbl_totaal_dagverbruik = total_day_consum from msg
+    tbl_totaal_nachtverbruik = total_night_consum from msg
+    tbl_totaal_dagopbrengst = total_day_output from msg
+    tbl_totaal_nachtopbrengst = total_night_output from msg
+    tbl_datum_tijd_gas = datetime from msg
+    tbl_totaal_gasverbruik = total_gas_consum from msg
+
+	tbl_next = NULL
+    tbl_list_next  = this tbl
+}
+
+read incoming msg{
+    //its 1 line
+	incoming errormsg = "datetime;rate_indicator; current_power; 
+                 current_voltage;total_day_consum;total_night_consum;
+                 total_day_output;total_night_output;datetime; 
+                 total_gas_consum"
+                 
+    if msg != End-Of-Report-record{
+        write msg in logfile //see "write in logfile" funtion
+    }
+}
+
+write in logfile{
+    open logfile
+    append incoming msg to file
+    close logfile
+}
+
+print on cmd{
+    print header            //same as word doc
+    print daily values      //same as word doc
+    print footer            //same as word doc
+}
+
+main{
+    connect to mqtt broker
+
+    if msg arrived{
+        run fuction "read incoming msg"
+    }
 }

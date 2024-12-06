@@ -99,14 +99,15 @@ void connlost(void *context, char *cause) {
     printf("     cause: %s\n", cause);
 }
 
+//write to logfile
 void logfile_write(char error_in[MAX_MSG_LEN]){
     FILE *logfile;
-    logfile = fopen("logfile.txt", "a");
+    logfile = fopen(logFilepath, "a");
     fprintf(logfile, "%s\n", error_in);
     fclose(logfile);
 }
 
-//print
+//print on cmd/terminal
 void cmdPrint_all(struct tbl **list){
     
     struct tbl *temp = head;
