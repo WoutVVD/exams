@@ -101,23 +101,45 @@ void connlost(void *context, char *cause) {
 //print
 void print_all(struct tbl **list){
     struct tbl *temp = head;
-    
+
     //print header
     printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
-            "Elektriciteit- en gas verbruik - totalen per dag\n"
-            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"   //extra empty line
-            "STARTWAARDEN\n\n"                                                                              //extra empty line
-            "DATUM - TIJD:  %s\n"
-            "DAG \t Totaal verbruik \t = %f kWh\n"
-            "DAG \t Totaal opbrengst \t = %f kWh\n"
-            "NACHT \t Totaal verbruik \t = %f kWh\n"
-            "NACHT \t Totaal opbrengst \t = %f kWh\n"
-            "GAS \t Totaal verbruik \t = %f m3\n"
-            "------------------------------------------------------------------------------------------\n"
-            "TOTALEN\n"
-            "------------------------------------------------------------------------------------------\n\n" //extra empty line
-            ,temp->datum_tijd_stroom,temp->totaal_dagverbruik,temp->totaal_dagopbrengst,temp->totaal_nachtverbruik,temp->totaal_nachtopbrengst,temp->totaal_gasverbruik
-            );
+           "Elektriciteit- en gas verbruik - totalen per dag\n"
+           "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"   //extra empty line
+           "STARTWAARDEN\n\n"                                                                              //extra empty line
+           "DATUM - TIJD:  %s\n"
+           "DAG \t Totaal verbruik \t = %f kWh\n"
+           "DAG \t Totaal opbrengst \t = %f kWh\n"
+           "NACHT \t Totaal verbruik \t = %f kWh\n"
+           "NACHT \t Totaal opbrengst \t = %f kWh\n"
+           "GAS \t Totaal verbruik \t = %f m3\n"
+           "------------------------------------------------------------------------------------------\n"
+           "TOTALEN\n"
+           "------------------------------------------------------------------------------------------\n\n" //extra empty line
+           ,temp->datum_tijd_stroom,temp->totaal_dagverbruik,temp->totaal_dagopbrengst,temp->totaal_nachtverbruik,temp->totaal_nachtopbrengst,temp->totaal_gasverbruik
+    );
+
+    float total_consum = temp->totaal_dagverbruik + temp->totaal_nachtverbruik;
+    float total_output = temp->totaal_dagopbrengst + temp->totaal_nachtopbrengst;
+
+
+    //print data
+    printf("Datum: %s\n"
+           "---------------\n"
+           "STROOM:\n"
+           "\t\t Totaal verbruik \t = %f kWh\n"
+           "\t\t Totaal opbrengs \t = %f kWh\n"
+           "GAS:\n"
+           "\t\t Totaal verbruik \t = %f kWh\n"
+           "*\n"
+           ,total_consum,total_output,temp->totaal_gasverbruik
+    );
+
+    //print footer
+    printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+           "Einde van dit rapport\n"
+           "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+    );
 }
 
 
