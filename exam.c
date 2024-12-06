@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>             //for sleep()
 #include <MQTTClient.h>
 #include "include.h"            //file with #includes
+
 
 volatile MQTTClient_deliveryToken deliveredtoken;
 
@@ -80,7 +82,6 @@ void delivered(void *context, MQTTClient_deliveryToken dt) {
 // This function is called upon when an incoming message from mqtt is arrived
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
     char *msg = message->payload;
-    logfile_write(msg);
 
     // Create a new client to publish the message
     MQTTClient client = (MQTTClient)context;
@@ -89,8 +90,17 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
-    
-    return 1;
+
+    //end of file report?
+    char endcheck[DATE_TIME_LEN];
+    char rest[MAX_MSG_LEN];
+    sscanf(msg, "%s;%s", endcheck, rest);
+    if(endcheck == "00.00.00-00:00:00"){
+        return 0;
+    }
+    else{
+        return 1;
+    }
 }
 
 //connection lost
@@ -154,6 +164,7 @@ void cmdPrint_all(struct tbl **list){
     );
 }
 
+//main
 int main() {
    // Open MQTT client for listening
     
@@ -176,7 +187,7 @@ int main() {
 
     // Keep the program running to continue receiving and publishing messages
     for(;;) {
-        delay(1);
+        sleep(.05);
     }
 
     MQTTClient_disconnect(client, 10000);

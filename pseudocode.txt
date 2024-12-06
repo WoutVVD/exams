@@ -76,7 +76,7 @@ write in logfile{
 
 print on cmd{
     print header            //same as word doc
-    print daily values      //same as word doc
+    print daily report      //same as word doc
     print footer            //same as word doc
 }
 
